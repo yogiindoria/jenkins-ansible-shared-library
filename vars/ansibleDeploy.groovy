@@ -11,4 +11,34 @@ def call() {
 
         echo "Repository cloned successfully."
     }
+
+    stage('User Approval') {
+        def keepApproval = true
+
+        if (keepApproval) {
+            input(
+                message: 'Do you want to proceed with SonarQube deployment?',
+                ok: 'Proceed'
+            )
+        } else {
+            echo "Approval stage skipped."
+        }
+    }
+
+    stage('Check Ansible') {
+        steps {
+            sh 'ansible --version'
+        }
+    }
+
+    stage('Playbook Execution') {
+        echo "Executing SonarQube Ansible playbook..."
+
+        sh '''
+            ansible-playbook -i inventory.ini site.yml --limit ubuntu
+        '''
+
+        echo "Ansible playbook execution completed."
+    }
+
 }
