@@ -47,4 +47,12 @@ def call() {
 
         echo "Ansible playbook execution completed."
     }
+
+    stage('Notification') {
+
+        slackSend(
+            channel: 'build-status',
+            message: 'SonarQube deployment completed successfully.'
+        )
+    }
 }
