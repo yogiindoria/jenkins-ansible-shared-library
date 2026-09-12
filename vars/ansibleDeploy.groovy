@@ -1,16 +1,29 @@
 def call() {
 
-    // Load configuration file
+    // Load configuration file from Shared Library resources
     def configText = libraryResource('sonarqube.properties')
-    def config = new Properties()
 
-    config.load(new StringReader(configText))
+    // Parse properties manually to avoid java.util.Properties
+    def config = configText.readLines()
+        .findAll { line ->
+            line.trim() &&
+            !line.trim().startsWith('#') &&
+            line.contains('=')
+        }
+        .collectEntries { line ->
+            def index = line.indexOf('=')
 
-    def slackChannel = config.getProperty('SLACK_CHANNEL_NAME')
-    def environment = config.getProperty('ENVIRONMENT')
-    def codeBasePath = config.getProperty('CODE_BASE_PATH')
-    def actionMessage = config.getProperty('ACTION_MESSAGE')
-    def keepApproval = config.getProperty('KEEP_APPROVAL_STAGE').toBoolean()
+            def key = line.substring(0, index).trim()
+            def value = line.substring(index + 1).trim()
+
+            [(key): value]
+        }
+
+    def slackChannel = config['SLACK_CHANNEL_NAME']
+    def environment = config['ENVIRONMENT']
+    def codeBasePath = config['CODE_BASE_PATH']
+    def actionMessage = config['ACTION_MESSAGE']
+    def keepApproval = config['KEEP_APPROVAL_STAGE'].toBoolean()
 
     stage('Clone') {
 
