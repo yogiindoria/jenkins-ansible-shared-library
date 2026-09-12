@@ -27,15 +27,23 @@ def call() {
 
     stage('Playbook Execution') {
 
-        echo "Checking Ansible installation..."
-
-        sh 'ansible --version'
-
         echo "Executing SonarQube Ansible playbook..."
 
-        sh '''
-            ansible-playbook -i inventory.ini site.yml
-        '''
+        withCredentials([
+            sshUserPrivateKey(
+                credentialsId: 'vm2-ssh-key',
+                keyFileVariable: 'SSH_KEY',
+                usernameVariable: 'SSH_USER'
+            )
+        ]) {
+            sh '''
+                ansible-playbook \
+                -i inventory.ini \
+                -u "$SSH_USER" \
+                --private-key "$SSH_KEY" \
+                site.yml
+            '''
+        }
 
         echo "Ansible playbook execution completed."
     }
