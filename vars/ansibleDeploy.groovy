@@ -25,20 +25,18 @@ def call() {
         }
     }
 
-    stage('Check Ansible') {
-        steps {
-            sh 'ansible --version'
-        }
-    }
-
     stage('Playbook Execution') {
+
+        echo "Checking Ansible installation..."
+
+        sh 'ansible --version'
+
         echo "Executing SonarQube Ansible playbook..."
 
         sh '''
-            ansible-playbook -i inventory.ini site.yml --limit ubuntu
+            ansible-playbook -i inventory.ini site.yml
         '''
 
         echo "Ansible playbook execution completed."
     }
-
 }
