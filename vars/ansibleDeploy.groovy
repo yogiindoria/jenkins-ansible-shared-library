@@ -1,3 +1,14 @@
 def call() {
-    echo "Ansible Shared Library Started"
+
+    stage('Clone') {
+        echo "Cloning AnsibleSonarQube repository..."
+
+        git(
+            url: 'https://github.com/yogiindoria/AnsibleSonarQube.git',
+            branch: 'main',
+            credentialsId: 'github-credentials'
+        )
+
+        echo "Repository cloned successfully."
+    }
 }
